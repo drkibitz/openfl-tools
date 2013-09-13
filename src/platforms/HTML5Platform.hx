@@ -91,6 +91,17 @@ class HTML5Platform implements IPlatformTool {
 			
 			ProcessHelper.openURL (project.app.url);
 			
+		} else if (project.server.host != "" && project.server.port > 0) {
+
+			ProcessHelper.openURL ("http://" + project.server.host + ":" + project.server.port + "/");
+
+			ProcessHelper.runProcess ("", "nekotools", [
+				"server",
+				"-h", project.server.host,
+				"-p", Std.string (project.server.port),
+				"-d", project.app.path + "/html5/bin"
+			] );
+
 		} else {
 			
 			ProcessHelper.openFile (project.app.path + "/html5/bin", "index.html");

@@ -38,6 +38,7 @@ class OpenFLProject {
 	public var meta:MetaData;
 	public var ndlls:Array <NDLL>;
 	public var platformType:PlatformType;
+	public var server:ServerData;
 	public var sources:Array <String>;
 	public var splashScreens:Array <SplashScreen>;
 	public var target:Platform;
@@ -48,6 +49,7 @@ class OpenFLProject {
 	
 	private var defaultApp:ApplicationData;
 	private var defaultMeta:MetaData;
+	private var defaultServer:ServerData;
 	private var defaultWindow:Window;
 	
 	public static var _command:String;
@@ -96,6 +98,7 @@ class OpenFLProject {
 		
 		defaultMeta = { title: "MyApplication", description: "", packageName: "com.example.myapp", version: "1.0.0", company: "Example, Inc.", buildNumber: "1", companyID: "" }
 		defaultApp = { main: "Main", file: "MyApplication", path: "bin", preloader: "NMEPreloader", swfVersion: 11, url: "" }
+		defaultServer = { host: "", port: 0 }
 		defaultWindow = { width: 800, height: 600, parameters: "{}", background: 0xFFFFFF, fps: 30, hardware: true, resizable: true, borderless: false, orientation: Orientation.AUTO, vsync: false, fullscreen: false, antialiasing: 0, allowShaders: true, requireShaders: false, depthBuffer: false, stencilBuffer: false }
 		
 		switch (target) {
@@ -149,10 +152,12 @@ class OpenFLProject {
 		
 		meta = {};
 		app = {};
+		server = {};
 		window = {};
 		
 		ObjectHelper.copyFields (defaultMeta, meta);
 		ObjectHelper.copyFields (defaultApp, app);
+		ObjectHelper.copyFields (defaultServer, server);
 		ObjectHelper.copyFields (defaultWindow, window);
 		
 		assets = new Array <Asset> ();
@@ -268,6 +273,8 @@ class OpenFLProject {
 		
 		project.templatePaths = templatePaths.copy ();
 		
+		ObjectHelper.copyFields (server, project.server);
+
 		ObjectHelper.copyFields (window, project.window);
 		
 		return project;
@@ -448,6 +455,7 @@ class OpenFLProject {
 			
 			ObjectHelper.copyUniqueFields (project.meta, meta, project.defaultMeta);
 			ObjectHelper.copyUniqueFields (project.app, app, project.defaultApp);
+			ObjectHelper.copyUniqueFields (project.server, server, project.defaultServer);
 			ObjectHelper.copyUniqueFields (project.window, window, project.defaultWindow);
 			
 			StringMapHelper.copyUniqueKeys (project.environment, environment);
@@ -525,10 +533,12 @@ class OpenFLProject {
 		
 		if (app == null) app = { };
 		if (meta == null) meta = { };
+		if (server == null) server = { };
 		if (window == null) window = { };
 		
 		ObjectHelper.copyMissingFields (defaultApp, app);
 		ObjectHelper.copyMissingFields (defaultMeta, meta);
+		ObjectHelper.copyMissingFields (defaultServer, server);
 		ObjectHelper.copyMissingFields (defaultWindow, window);
 		
 		config.populate ();
@@ -555,7 +565,13 @@ class OpenFLProject {
 		}
 		
 		context.APP_PACKAGE = context.META_PACKAGE = meta.packageName;
-		
+
+		for (field in Reflect.fields (server)) {
+			
+			Reflect.setField (context, "SRV_" + StringHelper.formatUppercaseVariable (field), Reflect.field (server, field));
+			
+		}
+
 		for (field in Reflect.fields (window)) {
 			
 			Reflect.setField (context, "WIN_" + StringHelper.formatUppercaseVariable (field), Reflect.field (window, field));

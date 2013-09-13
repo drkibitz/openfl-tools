@@ -1085,6 +1085,10 @@ class ProjectXMLParser extends OpenFLProject {
 						
 						haxeflags.push (substitute (flag));
 					
+					case "server":
+						
+						parseServerElement (element);
+					
 					case "window":
 						
 						parseWindowElement (element);
@@ -1366,7 +1370,27 @@ class ProjectXMLParser extends OpenFLProject {
 		
 	}
 	
-	
+	private function parseServerElement (element:Fast):Void {
+		
+		for (attribute in element.x.attributes ()) {
+			
+			switch (attribute) {
+				
+				case "host":
+					
+					server.host = substitute (element.att.resolve (attribute));
+
+				case "port":
+					
+					server.port = Std.parseInt (substitute (element.att.resolve (attribute)));
+
+			}
+			
+		}
+		
+	}
+
+
 	private function parseWindowElement (element:Fast):Void {
 		
 		for (attribute in element.x.attributes ()) {
